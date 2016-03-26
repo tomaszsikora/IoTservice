@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:ng="http://angularjs.org">
+<head>
+    <title>IoT Service</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="./bower_components/bootstrap-css-only/css/bootstrap.min.css" />
+    <script type="text/javascript" src="./bower_components/angular/angular.min.js"></script>
+    <script type="text/javascript" src="./bower_components/angular-resource/angular-resource.min.js"></script>
+    <script type="text/javascript" src="./bower_components/lodash/dist/lodash.min.js"></script>
+    <script>
+  angular.module('myApp', [])
+    .controller('DeviceController', function ($scope, $http) {
+    $scope.devices = null;
+        $http.get('device').success(function(data) {
+        $scope.devices = data;
+      });
+      $scope.master = {};
+
+      $scope.update = function(device) {
+        $scope.master = angular.copy(device);
+      };
+
+      $scope.getDevices = function ($scope, $http) {
+      $http.get('device').success(function(data) {
+        $scope.devices = data;
+      });
+
+      $scope.reset = function() {
+        $scope.device = angular.copy($scope.master);
+      };
+
+      $scope.showForm = function(bool) {
+        $scope.showme = bool;
+      };
+
+      $scope.reset();
+    });
+</script>
+</head>
+<body ng-app="myApp">
+<h1>IoT Service</h1>
+<p>Register your sensor device and observe values online!</p>
+
+<button ng-click="showme=true">Add device</button>
+<div ng-controller="DeviceController" ng-show="showme">
+    <form novalidate="" class="simple-form">
+        Device Name: <input type="text" ng-model="device.name" /><br />
+        Device Id: <input type="number" ng-model="device.id" /><br />
+        Device Type:<input type="radio" ng-model="device.type" value="THERMOMETER" />THERMOMETER
+        <input type="radio" ng-model="device.type" value="UNKNOWN" />UNKNOWN<br />
+        <input type="button" ng-click="reset()" value="Reset" />
+        <input type="submit" ng-click="update(device)" value="Save" />
+    </form>
+    <pre>device = {{device.name}}</pre>
+    <pre>master = {{master|json}}</pre>
+</div>
+
+{{devices}}
+
+
+<div>
+    <h2 ng-onclick="getDevices()">Registered devices</h2>
+    <table>
+        <tbody>
+        <tr ng-repeat="i in devices">
+            <td>{{$index}}</td><td>{{i.deviceName}}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
